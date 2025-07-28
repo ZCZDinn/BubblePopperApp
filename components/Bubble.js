@@ -31,8 +31,9 @@ import { View, StyleSheet, Image } from 'react-native';
  */
 export default function Bubble({ x, y, radius }) {
   return (
+    // Using an image for the bubble instead of a simple circle
     <Image
-      source={require('../assets/bubble_img.png')} // Place your bubble.png in the assets folder
+      source={require('../assets/bubble_img.png')} // Placed bubble_img.png in the assets folder
       style={[
         styles.bubble,
         {
