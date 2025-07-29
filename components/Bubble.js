@@ -27,9 +27,12 @@ import { View, StyleSheet, Image } from 'react-native';
  * @param {number} props.x - X coordinate of the bubble
  * @param {number} props.y - Y coordinate of the bubble
  * @param {number} props.radius - Radius of the bubble
+ * @param {string} [props.color] - Optional color for the bubble
  * @returns {React.Component} Rendered bubble
  */
-export default function Bubble({ x, y, radius }) {
+
+export default function Bubble({ x, y, radius, color }) {
+
   return (
     // Using an image for the bubble instead of a simple circle
     <Image
@@ -42,6 +45,7 @@ export default function Bubble({ x, y, radius }) {
           width: radius * 2,
           height: radius * 2,
           borderRadius: radius,
+          tintColor: color, // Use provided color
         },
       ]}
       resizeMode="contain"

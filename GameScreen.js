@@ -143,6 +143,24 @@ export default function GameScreen() {
       setLaserVisible(false);
     }, 300);
   };
+
+  // List of possible bubble colors
+  const BUBBLE_COLORS = [
+    '#ff4d4d',   // red
+    '#4dff4d',   // green
+    '#ffe14d',   // yellow
+    '#4d4dff',   // dark blue
+    '#b84dff',   // purple
+  ];
+
+  // Map of colors to scores, this allows for complex scoring based on bubble color
+  const COLOR_SCORES = {
+  '#4d4dff': 1,   // dark blue
+  '#4dff4d': 2,   // green
+  '#ffe14d': 3,   // yellow
+  '#ff4d4d': 4,   // red
+  '#b84dff': 5,   // purple
+  };
   
   /**
    * Check if laser hits any bubbles
@@ -151,7 +169,7 @@ export default function GameScreen() {
   const checkHits = (laserX) => {
     setBubbles(prevBubbles => {
       const hitBubbleIds = [];
-      let hitCount = 0;
+      let pointsToAdd = 0;
       
       /**
        * ============== STUDENT TASK 4 ==============
@@ -180,19 +198,25 @@ export default function GameScreen() {
         // If laser is within bubble radius, it's a hit
         if (distanceX <= bubble.radius) {
           hitBubbleIds.push(bubble.id);
-          hitCount++;
+          // Add points based on bubble color
+          pointsToAdd += COLOR_SCORES[bubble.color] || 1; // Default to 1 if color not found
         }
       });
       
       // If any bubbles were hit, update the score
-      if (hitCount > 0) {
-        setScore(prevScore => prevScore + hitCount);
+      if (pointsToAdd > 0) {
+        setScore(prevScore => prevScore + pointsToAdd);
       }
       
       // Return bubbles that weren't hit
       return prevBubbles.filter(bubble => !hitBubbleIds.includes(bubble.id));
     });
   };
+
+  // Helper to pick a random color
+  function getRandomColor() {
+    return BUBBLE_COLORS[Math.floor(Math.random() * BUBBLE_COLORS.length)];
+  }
   
   /**
    * Spawn a new bubble with random horizontal position
@@ -207,6 +231,7 @@ export default function GameScreen() {
       x: Math.random() * maxX,
       y: screenHeight - 100, // Start near bottom of screen
       radius: radius,
+      color: getRandomColor(), // Assign random color
     };
     
     setBubbles(prev => [...prev, newBubble]);
@@ -307,6 +332,7 @@ export default function GameScreen() {
               x={bubble.x}
               y={bubble.y}
               radius={bubble.radius}
+              color={bubble.color}
             />
           ))}
           
