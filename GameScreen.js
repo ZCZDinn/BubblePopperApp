@@ -391,9 +391,13 @@ export default function GameScreen() {
         <View style={styles.overlay}>
           <Text style={styles.title}>Bubble Popper</Text>
           <TouchableWithoutFeedback onPress={startGame}>
-            <View style={styles.button}>
+            <ImageBackground
+              source={require('./assets/button-bg.png')} // button image
+              style={styles.imageButton}
+              imageStyle={{ borderRadius: 25 }}
+            >
               <Text style={styles.buttonText}>Start Game</Text>
-            </View>
+            </ImageBackground>
           </TouchableWithoutFeedback>
         </View>
       )}
@@ -404,9 +408,13 @@ export default function GameScreen() {
           <Text style={styles.title}>Game Over</Text>
           <Text style={styles.scoreText}>Final Score: {score}</Text>
           <TouchableWithoutFeedback onPress={resetGame}>
-            <View style={styles.button}>
+            <ImageBackground
+              source={require('./assets/button-bg.png')} // button image
+              style={styles.imageButton}
+              imageStyle={{ borderRadius: 25 }}
+            >
               <Text style={styles.buttonText}>Play Again</Text>
-            </View>
+            </ImageBackground>
           </TouchableWithoutFeedback>
         </View>
       )}
@@ -475,10 +483,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     borderRadius: 25,
   },
+  imageButton: {
+    width: 200,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 10,
+  },
   buttonText: {
-    color: 'white',
+    color: 'darkblue',
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '900',
+    fontStyle:'italic',
+    fontVariant: 'lining-nums',
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   gun: {
     position: 'absolute',
