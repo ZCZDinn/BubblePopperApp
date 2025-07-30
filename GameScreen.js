@@ -31,7 +31,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, Text, Dimensions, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, View, Text, Dimensions, TouchableWithoutFeedback, ImageBackground } from 'react-native';
 import Bubble from './components/Bubble';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
@@ -322,57 +322,63 @@ export default function GameScreen() {
   
   return (
     <View style={styles.container}>
-      {/* Game area */}
-      <TouchableWithoutFeedback onPress={handleTap} disabled={!gameStarted || gameOver}>
-        <View style={styles.gameArea}>
-          {/* Bubbles */}
-          {bubbles.map(bubble => (
-            <Bubble
-              key={`bubble-${bubble.id}`}
-              x={bubble.x}
-              y={bubble.y}
-              radius={bubble.radius}
-              color={bubble.color}
-            />
-          ))}
-          
-          {/**
-           * ============== STUDENT TASK 5 ==============
-           * TODO: MODIFY LASER RENDERING
-           * Currently the laser is a simple vertical line.
-           * Enhance it to:
-           * 1. Render based on gun position and angle
-           * 2. Add visual effects (color, thickness, etc.)
-           * 3. Consider adding a cooldown or power meter
-           */}
-          
-          {/* Laser - currently fixed to fire from center of gun */}
-          {laserVisible && (
-            <View
-              style={[
-                styles.laser,
-                { left: gunCenterX - 2 } // Center the 4px wide laser from gun center
-              ]}
-            />
-          )}
-          
-          {/**
-           * ============== STUDENT TASK 6 ==============
-           * TODO: MODIFY GUN RENDERING
-           * Currently the gun is fixed at the bottom center.
-           * Update it to:
-           * 1. Use the gun position state you created
-           * 2. Add visual indication of gun direction/angle
-           * 3. Add controls or touch areas for movement
-           */}
-          
-          {/* Gun - currently static in middle */}
-          <View style={[styles.gun, { left: gunPosition }]}>
-            <View style={styles.gunBase} />
-            <View style={styles.gunBarrel} />
+      {/* Game area with background image */}
+      <ImageBackground
+        source={require('./assets/background.jpg')} // Background Image
+        style={styles.backgroundImage}
+        resizeMode="cover"
+      >
+        <TouchableWithoutFeedback onPress={handleTap} disabled={!gameStarted || gameOver}>
+          <View style={styles.gameArea}>
+            {/* Bubbles */}
+            {bubbles.map(bubble => (
+              <Bubble
+                key={`bubble-${bubble.id}`}
+                x={bubble.x}
+                y={bubble.y}
+                radius={bubble.radius}
+                color={bubble.color}
+              />
+            ))}
+            
+            {/**
+             * ============== STUDENT TASK 5 ==============
+             * TODO: MODIFY LASER RENDERING
+             * Currently the laser is a simple vertical line.
+             * Enhance it to:
+             * 1. Render based on gun position and angle
+             * 2. Add visual effects (color, thickness, etc.)
+             * 3. Consider adding a cooldown or power meter
+             */}
+            
+            {/* Laser - currently fixed to fire from center of gun */}
+            {laserVisible && (
+              <View
+                style={[
+                  styles.laser,
+                  { left: gunCenterX - 2 } // Center the 4px wide laser from gun center
+                ]}
+              />
+            )}
+            
+            {/**
+             * ============== STUDENT TASK 6 ==============
+             * TODO: MODIFY GUN RENDERING
+             * Currently the gun is fixed at the bottom center.
+             * Update it to:
+             * 1. Use the gun position state you created
+             * 2. Add visual indication of gun direction/angle
+             * 3. Add controls or touch areas for movement
+             */}
+            
+            {/* Gun - currently static in middle */}
+            <View style={[styles.gun, { left: gunPosition }]}>
+              <View style={styles.gunBase} />
+              <View style={styles.gunBarrel} />
+            </View>
           </View>
-        </View>
-      </TouchableWithoutFeedback>
+        </TouchableWithoutFeedback>
+      </ImageBackground>
 
       {/* Score and Timer */}
       <View style={styles.hudContainer}>
@@ -421,7 +427,11 @@ export default function GameScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000033',
+  },
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
   },
   gameArea: {
     flex: 1,
