@@ -31,7 +31,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, Text, Dimensions, TouchableWithoutFeedback, ImageBackground } from 'react-native';
+import { StyleSheet, View, Text, Dimensions, TouchableWithoutFeedback, TouchableOpacity, Image, ImageBackground } from 'react-native';
 import Bubble from './components/Bubble';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
@@ -389,8 +389,12 @@ export default function GameScreen() {
       {/* Start Screen */}
       {!gameStarted && !gameOver && (
         <View style={styles.overlay}>
-          <Text style={styles.title}>Bubble Popper</Text>
-          <TouchableWithoutFeedback onPress={startGame}>
+          <Image
+            source={require('./assets/bubble_popper.png')}
+            style={styles.bubbleTitle}
+            resizeMode="contain"
+          />
+          <TouchableOpacity onPress={startGame} activeOpacity={0.5}>
             <ImageBackground
               source={require('./assets/button-bg.png')} // button image
               style={styles.imageButton}
@@ -398,16 +402,20 @@ export default function GameScreen() {
             >
               <Text style={styles.buttonText}>Start Game</Text>
             </ImageBackground>
-          </TouchableWithoutFeedback>
+          </TouchableOpacity>
         </View>
       )}
       
       {/* Game Over Screen */}
       {gameOver && (
         <View style={styles.overlay}>
-          <Text style={styles.title}>Game Over</Text>
+          <Image
+            source={require('./assets/game_over.png')}
+            style={styles.bubbleTitle}
+            resizeMode="contain"
+          />
           <Text style={styles.scoreText}>Final Score: {score}</Text>
-          <TouchableWithoutFeedback onPress={resetGame}>
+          <TouchableOpacity onPress={resetGame} activeOpacity={0.5}>
             <ImageBackground
               source={require('./assets/button-bg.png')} // button image
               style={styles.imageButton}
@@ -415,7 +423,7 @@ export default function GameScreen() {
             >
               <Text style={styles.buttonText}>Play Again</Text>
             </ImageBackground>
-          </TouchableWithoutFeedback>
+          </TouchableOpacity>
         </View>
       )}
     </View>
@@ -456,9 +464,14 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   scoreText: {
-    color: 'white',
+    color: 'cyan',
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '900',
+    fontStyle:'italic',
+    fontVariant: 'lining-nums',
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   overlay: {
     position: 'absolute',
@@ -470,6 +483,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 100,
+  },
+  bubbleTitle: {
+    width: 300,
+    height: 60,
+    marginBottom: 10,
   },
   title: {
     color: 'white',
@@ -492,14 +510,14 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   buttonText: {
-    color: 'darkblue',
+    color: '#9D00FF',
     fontSize: 18,
     fontWeight: '900',
     fontStyle:'italic',
     fontVariant: 'lining-nums',
     textShadowColor: 'rgba(0,0,0,0.5)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
+    textShadowOffset: { width: -1, height: 0 },
+    textShadowRadius: 1,
   },
   gun: {
     position: 'absolute',
