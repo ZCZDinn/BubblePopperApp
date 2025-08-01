@@ -31,7 +31,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, Text, Dimensions, TouchableWithoutFeedback, TouchableOpacity, Image, ImageBackground } from 'react-native';
+import { StyleSheet, View, Text, Dimensions, TouchableWithoutFeedback, TouchableOpacity, Image, ImageBackground, PanResponder } from 'react-native';
 import Bubble from './components/Bubble';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
@@ -69,10 +69,15 @@ export default function GameScreen() {
    * });
    */
   
-  // Fixed gun position - currently in the middle (MODIFY THIS)
+  // Dynamic gun position - allows for horizontal movement of the gun
   const gunWidth = 60;
-  const gunPosition = screenWidth / 2 - gunWidth / 2;
-  const gunCenterX = screenWidth / 2;
+  const [gunX, setGunX] = useState(screenWidth / 2 - gunWidth / 2);
+  const initialGunX = useRef(gunX);
+  const gunXRef = useRef(gunX);
+
+  useEffect(() => {
+    gunXRef.current = gunX;
+  }, [gunX]);
   
   /**
    * ============== STUDENT TASK 2 ==============
@@ -90,6 +95,30 @@ export default function GameScreen() {
    *   setGunPosition({ x: locationX - gunWidth/2, y: locationY });
    * };
    */
+
+  //PanResponder to allow for dynamic gun movement based on a 'touch and drag' movement style
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: (evt, gestureState) => {
+        const touchX = evt.nativeEvent.pageX;
+        const gunLeft = gunXRef.current;
+        const gunRight = gunXRef.current + gunWidth;
+        return touchX >= gunLeft && touchX <= gunRight;
+      },
+      onPanResponderGrant: () => {
+        initialGunX.current = gunXRef.current;
+      },
+      onPanResponderMove: (evt, gestureState) => {
+        let newX = initialGunX.current + gestureState.dx;
+        newX = Math.max(0, Math.min(screenWidth - gunWidth, newX));
+        setGunX(newX);
+      },
+      onPanResponderRelease: () => {
+        fireLaser(gunXRef.current + gunWidth / 2);
+      },
+      onPanResponderTerminationRequest: () => false,
+    })
+  ).current;
   
   // Refs for game timers and IDs
   const bubbleIdRef = useRef(1);
@@ -110,7 +139,7 @@ export default function GameScreen() {
    * Fire a laser from the gun center
    * Creates visible laser and checks for bubble hits
    */
-  const fireLaser = () => {
+  const fireLaser = (laserX = gunX + gunWidth / 2) => {
     // Clear any existing laser timeout
     if (laserTimeoutRef.current) {
       clearTimeout(laserTimeoutRef.current);
@@ -136,7 +165,7 @@ export default function GameScreen() {
      */
     
     // Check for hits immediately
-    checkHits(gunCenterX);
+    checkHits(laserX);
     
     // Make laser disappear after 300ms
     laserTimeoutRef.current = setTimeout(() => {
@@ -357,34 +386,40 @@ export default function GameScreen() {
                 style={[
                   styles.laser,
                   {
-                    left: gunCenterX - 2, // Center the laser
-                    bottom: 70,           // 10 (gun bottom) + 60 (gun height)
-                    height: screenHeight - 70, // Laser height from gun tip to top
+                    left: gunX + gunWidth / 2 - 2, // Center the laser
+                    bottom: 80,           // 20 (gun bottom) + 60 (gun height)
+                    height: screenHeight - 80, // Laser height from gun tip to top
                   }
                 ]}
               />
             )}
-            
-            {/**
-             * ============== STUDENT TASK 6 ==============
-             * TODO: MODIFY GUN RENDERING
-             * Currently the gun is fixed at the bottom center.
-             * Update it to:
-             * 1. Use the gun position state you created
-             * 2. Add visual indication of gun direction/angle
-             * 3. Add controls or touch areas for movement
-             */}
-            
-            {/* Gun - currently static in middle */}
-            <Image
-              source={require('./assets/tank_img.png')} //new gun image for styling
-              style={[
-                styles.gun,
-                { left: gunPosition, width: 60, height: 60 }, // keep proportions
-              ]}
-            />
           </View>
         </TouchableWithoutFeedback>
+            
+        {/**
+         * ============== STUDENT TASK 6 ==============
+         * TODO: MODIFY GUN RENDERING
+         * Currently the gun is fixed at the bottom center.
+         * Update it to:
+         * 1. Use the gun position state you created
+         * 2. Add visual indication of gun direction/angle
+         * 3. Add controls or touch areas for movement
+         */}
+        
+        {/* Gun - currently static in middle */}
+        <View
+          style={[
+            styles.gun,
+            { left: gunX, width: gunWidth, height: 60 },
+          ]}
+          {...panResponder.panHandlers}
+        >
+          <Image
+            source={require('./assets/tank_img3.png')}
+            style={{ width: gunWidth, height: 60 }}
+            resizeMode="contain"
+          />
+        </View>
       </ImageBackground>
 
       {/* Score and Timer */}
@@ -528,7 +563,7 @@ const styles = StyleSheet.create({
   },
   gun: {
     position: 'absolute',
-    bottom: 10,
+    bottom: 20,
     width: 60,
     height: 60,
     zIndex: 50,
