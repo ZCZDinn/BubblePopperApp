@@ -356,7 +356,11 @@ export default function GameScreen() {
               <View
                 style={[
                   styles.laser,
-                  { left: gunCenterX - 2 } // Center the 4px wide laser from gun center
+                  {
+                    left: gunCenterX - 2, // Center the laser
+                    bottom: 70,           // 10 (gun bottom) + 60 (gun height)
+                    height: screenHeight - 70, // Laser height from gun tip to top
+                  }
                 ]}
               />
             )}
@@ -372,10 +376,13 @@ export default function GameScreen() {
              */}
             
             {/* Gun - currently static in middle */}
-            <View style={[styles.gun, { left: gunPosition }]}>
-              <View style={styles.gunBase} />
-              <View style={styles.gunBarrel} />
-            </View>
+            <Image
+              source={require('./assets/tank_img.png')} //new gun image for styling
+              style={[
+                styles.gun,
+                { left: gunPosition, width: 60, height: 60 }, // keep proportions
+              ]}
+            />
           </View>
         </TouchableWithoutFeedback>
       </ImageBackground>
@@ -524,31 +531,10 @@ const styles = StyleSheet.create({
     bottom: 10,
     width: 60,
     height: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
     zIndex: 50,
-    backgroundColor: '#555',
-    borderRadius: 5,
-  },
-  gunBase: {
-    position: 'absolute',
-    bottom: 0,
-    width: 40,
-    height: 20,
-    backgroundColor: '#333',
-    borderTopLeftRadius: 5,
-    borderTopRightRadius: 5,
-  },
-  gunBarrel: {
-    position: 'absolute',
-    bottom: 20,
-    width: 10,
-    height: 30,
-    backgroundColor: '#222',
   },
   laser: {
     position: 'absolute',
-    top: 0,
     width: 4,
     height: '100%',
     backgroundColor: '#ff0000',
