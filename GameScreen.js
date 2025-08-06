@@ -626,18 +626,6 @@ const styles = StyleSheet.create({
     height: 60,
     marginBottom: 10,
   },
-  title: {
-    color: 'white',
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  button: {
-    backgroundColor: '#4CAF50',
-    paddingVertical: 12,
-    paddingHorizontal: 30,
-    borderRadius: 25,
-  },
   imageButton: {
     width: 200,
     height: 50,
