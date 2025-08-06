@@ -131,14 +131,21 @@ export default function GameScreen() {
         newX = Math.max(0, Math.min(screenWidth - gunWidth, newX));
         setGunX(newX);
       },
-      onPanResponderRelease: () => {
+      onPanResponderRelease: (evt, gestureState) => {
         setIsCharging(false);
         if (chargeAnimLoop.current) {
           chargeAnimLoop.current.stop();
           chargeAnimLoop.current = null;
         }
         chargeAnim.setValue(1);
-        fireLaser(gunXRef.current + gunWidth / 2);
+
+        // Calculate the latest gunX based on gesture
+        let newX = initialGunX.current + gestureState.dx;
+        newX = Math.max(0, Math.min(screenWidth - gunWidth, newX));
+        setGunX(newX);
+
+        // Use this newX for firing the laser
+        fireLaser(newX + gunWidth / 2);
       },
       onPanResponderTerminationRequest: () => false,
     })
