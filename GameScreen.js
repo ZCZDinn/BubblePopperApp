@@ -363,6 +363,9 @@ export default function GameScreen() {
     setTimeLeft(120);
     setLaserVisible(false);
     bubbleIdRef.current = 1;
+
+    // Reset gun position to center
+    setGunX(screenWidth / 2 - gunWidth / 2);
     
     if (timerRef.current) clearInterval(timerRef.current);
     if (bubbleTimerRef.current) clearInterval(bubbleTimerRef.current);
