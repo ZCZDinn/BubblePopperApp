@@ -31,8 +31,11 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, Text, Dimensions, TouchableWithoutFeedback, TouchableOpacity, Image, ImageBackground, PanResponder } from 'react-native';
+import { StyleSheet, View, Text, Dimensions, Animated, TouchableWithoutFeedback, TouchableOpacity, Image, ImageBackground, PanResponder } from 'react-native';
 import Bubble from './components/Bubble';
+import ScorePopup from './components/ScorePopup';
+import BubblePopEffect from './components/BubblePopEffect';
+import Laser from './components/Laser';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -69,7 +72,7 @@ export default function GameScreen() {
    * });
    */
   
-  // Dynamic gun position - allows for horizontal movement of the gun
+  // Dynamic gun position variables - allows for horizontal movement of the gun
   const gunWidth = 60;
   const [gunX, setGunX] = useState(screenWidth / 2 - gunWidth / 2);
   const initialGunX = useRef(gunX);
@@ -78,6 +81,11 @@ export default function GameScreen() {
   useEffect(() => {
     gunXRef.current = gunX;
   }, [gunX]);
+
+  //Charging animation values - when moving/holding the gun a charging effect will be shown
+  const [isCharging, setIsCharging] = useState(false);
+  const chargeAnim = useRef(new Animated.Value(1)).current;
+  const chargeAnimLoop = useRef(null);
   
   /**
    * ============== STUDENT TASK 2 ==============
@@ -97,6 +105,7 @@ export default function GameScreen() {
    */
 
   //PanResponder to allow for dynamic gun movement based on a 'touch and drag' movement style
+  //Incorporates a charging animation when moving/holding the gun
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: (evt, gestureState) => {
@@ -107,6 +116,15 @@ export default function GameScreen() {
       },
       onPanResponderGrant: () => {
         initialGunX.current = gunXRef.current;
+        setIsCharging(true);
+        chargeAnim.setValue(1);
+        chargeAnimLoop.current = Animated.loop(
+          Animated.sequence([
+            Animated.timing(chargeAnim, { toValue: 1.5, duration: 400, useNativeDriver: false }),
+            Animated.timing(chargeAnim, { toValue: 1, duration: 400, useNativeDriver: false }),
+          ])
+        );
+        chargeAnimLoop.current.start();
       },
       onPanResponderMove: (evt, gestureState) => {
         let newX = initialGunX.current + gestureState.dx;
@@ -114,6 +132,12 @@ export default function GameScreen() {
         setGunX(newX);
       },
       onPanResponderRelease: () => {
+        setIsCharging(false);
+        if (chargeAnimLoop.current) {
+          chargeAnimLoop.current.stop();
+          chargeAnimLoop.current = null;
+        }
+        chargeAnim.setValue(1);
         fireLaser(gunXRef.current + gunWidth / 2);
       },
       onPanResponderTerminationRequest: () => false,
@@ -133,7 +157,7 @@ export default function GameScreen() {
   const handleTap = () => {
     if (!gameStarted || gameOver) return;
     fireLaser();
-  };
+  }; 
   
   /**
    * Fire a laser from the gun center
@@ -190,6 +214,12 @@ export default function GameScreen() {
   '#ff4d4d': 4,   // red
   '#b84dff': 5,   // purple
   };
+
+  // State for score popups (appear when bubbles are popped)
+  const [scorePopups, setScorePopups] = useState([]); // {id, x, y, value}
+
+  // State for Bubble pop animation (appear when bubbles are popped)
+  const [popAnimations, setPopAnimations] = useState([]); // {id, x, y, radius}
   
   /**
    * Check if laser hits any bubbles
@@ -227,8 +257,32 @@ export default function GameScreen() {
         // If laser is within bubble radius, it's a hit
         if (distanceX <= bubble.radius) {
           hitBubbleIds.push(bubble.id);
+
           // Add points based on bubble color
-          pointsToAdd += COLOR_SCORES[bubble.color] || 1; // Default to 1 if color not found
+          const points = COLOR_SCORES[bubble.color] || 1;
+          pointsToAdd += points;
+
+          // Add score popup
+          setScorePopups(prev => [
+            ...prev,
+            {
+              id: `${bubble.id}-${Date.now()}-${Math.random()}`,
+              x: bubble.x + bubble.radius,
+              y: bubble.y,
+              value: points,
+            }
+          ]);
+
+          // Bubble pop animation
+          setPopAnimations(prev => [
+            ...prev,
+            {
+              id: `${bubble.id}-${Date.now()}-${Math.random()}`,
+              x: bubble.x,
+              y: bubble.y,
+              radius: bubble.radius,
+            }
+          ]);
         }
       });
       
@@ -353,7 +407,7 @@ export default function GameScreen() {
     <View style={styles.container}>
       {/* Game area with background image */}
       <ImageBackground
-        source={require('./assets/background.jpg')} // Background Image
+        source={require('./assets/background.png')} // Background Image
         style={styles.backgroundImage}
         resizeMode="cover"
       >
@@ -369,6 +423,52 @@ export default function GameScreen() {
                 color={bubble.color}
               />
             ))}
+
+            {/* Score Popup Effect */}
+            {scorePopups.map(popup => (
+              <ScorePopup
+                key={popup.id}
+                x={popup.x}
+                y={popup.y}
+                value={popup.value}
+                onComplete={() =>
+                  setScorePopups(prev => prev.filter(p => p.id !== popup.id))
+                }
+              />
+            ))}
+
+            {/* Bubble Pop Effect */}
+            {popAnimations.map(pop => (
+              <BubblePopEffect
+                key={pop.id}
+                x={pop.x}
+                y={pop.y}
+                radius={pop.radius}
+                onComplete={() =>
+                  setPopAnimations(anims => anims.filter(a => a.id !== pop.id))
+                }
+              />
+            ))}
+
+            {/* Charging Ball */}
+            {isCharging && (
+              <Animated.View
+                style={{
+                  position: 'absolute',
+                  left: gunX + gunWidth / 2 - 11, // Centered at gun tip, half of new width
+                  bottom: 85,                     // Moved down from 90 to 80
+                  width: 22,
+                  height: 22,
+                  borderRadius: 11,
+                  backgroundColor: '#fff',        // White inner color
+                  borderWidth: 3,
+                  borderColor: '#ff0000',
+                  opacity: 0.9,
+                  transform: [{ scale: chargeAnim }],
+                  zIndex: 100,
+                }}
+              />
+            )}
             
             {/**
              * ============== STUDENT TASK 5 ==============
@@ -380,17 +480,12 @@ export default function GameScreen() {
              * 3. Consider adding a cooldown or power meter
              */}
             
-            {/* Laser - currently fixed to fire from center of gun */}
+            {/* Laser - fires from center of gun based on gun position */}
             {laserVisible && (
-              <View
-                style={[
-                  styles.laser,
-                  {
-                    left: gunX + gunWidth / 2 - 2, // Center the laser
-                    bottom: 80,           // 20 (gun bottom) + 60 (gun height)
-                    height: screenHeight - 80, // Laser height from gun tip to top
-                  }
-                ]}
+              <Laser 
+                gunX={gunX}
+                gunWidth={gunWidth} 
+                screenHeight={screenHeight} 
               />
             )}
           </View>
@@ -406,7 +501,7 @@ export default function GameScreen() {
          * 3. Add controls or touch areas for movement
          */}
         
-        {/* Gun - currently static in middle */}
+        {/* Gun - dynamically moveable horizontally, incorporates a charging animation when held */}
         <View
           style={[
             styles.gun,
@@ -563,21 +658,9 @@ const styles = StyleSheet.create({
   },
   gun: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 30, //Moved gun up from bottom to avoid overlap with android navigation bar
     width: 60,
     height: 60,
     zIndex: 50,
-  },
-  laser: {
-    position: 'absolute',
-    width: 4,
-    height: '100%',
-    backgroundColor: '#ff0000',
-    shadowColor: '#ff0000',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 1,
-    shadowRadius: 10,
-    elevation: 20,
-    zIndex: 90,
   },
 });
