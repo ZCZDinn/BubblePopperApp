@@ -6,8 +6,9 @@ A React Native mobile game built with Expo CLI for CP4282 Programming for Mobile
 
 Bubble Popper is a simple one-screen mobile game where:
 - Bubbles rise from the bottom of the screen every 0.5 seconds
-- Players tap anywhere to shoot a vertical red laser
-- Lasers pop bubbles for points (+1 point per bubble)
+- Players tap anywhere to shoot a vertical red laser from the gun
+- Players tap and hold the gun to drag it for horizontal movement (upon release also shoots a vertical laser from the gun)
+- Lasers pop bubbles for points (+1pt for Blue Bubbles, +2pts for Green Bubbles, +3pts for Yellow Bubbles, +4pts for Red Bubbles, +5pts for Purple Bubbles)
 - Game lasts for 120 seconds
 - Final score is displayed with a "Play Again" option
 
@@ -15,8 +16,9 @@ Bubble Popper is a simple one-screen mobile game where:
 
 1. **Bubble Spawner**: Creates a circle every 0.5s at bottom with random x position
 2. **Bubble Motion**: Moves each bubble straight upward until it leaves the top
-3. **Laser Shot**: On any tap, draws a vertical red line from bottom that lasts 0.3s
-4. **Hit Test**: If laser crosses a bubble, removes bubble and adds +1 point
+3. **Laser Shot**: On any tap, draws a vertical red line from the tip of the gun that lasts 0.3s.
+4. **Gun Movement/Secondary Laser Shot**: On tapping and holding the gun, allows for dragging the position of the gun for horizontal movement. Upon releasing creates a **Laser Shot**
+4. **Hit Test**: If laser crosses a bubble, removes bubble and adds points based on the bubble color (Blue=1, Green=2, Yellow=3, Red=4, Purple=5)
 5. **Score Label**: Shows "Score: N" in the top-left corner
 6. **Countdown Timer**: Starts at 120s, when it hits 0, freezes play and shows Game Over with final score and Play Again button
 
@@ -83,21 +85,24 @@ npm start
 
 1. Tap "Start Game" to begin
 2. Bubbles will start spawning from the bottom and floating upward
-3. Tap anywhere on the screen to shoot a red laser vertically
-4. Try to hit as many bubbles as possible within 120 seconds
-5. Each bubble hit gives you +1 point
-6. When time runs out, your final score is displayed
-7. Tap "Play Again" to restart
+3. Tap anywhere on the screen to shoot a red laser vertically from the gun
+4. Tap and hold the gun, and drag it along the screen for horizontal gun movement. Releasing the gun will shoot a red laser vertically from the gun
+5. Try to hit as many bubbles as possible within 120 seconds
+6. Each bubble hit gives you points based on the bubble color (Blue=1, Green=2, Yellow=3, Red=4, Purple=5)
+7. When time runs out, your final score is displayed
+8. Tap "Play Again" to restart
 
 ## Game Controls
 
 - **Tap anywhere**: Shoot laser
+- **Tap and hold gun**: Drag for horizontal movement along the screen
+- **Release hold on gun**: Shoot laser
 - **Start Game button**: Begin new game
 - **Play Again button**: Restart after game over
 
 ## Scoring
 
-- Each bubble popped = +1 point
+- Each bubble popped = +n point(s) based on the color (Where n is [Blue=1, Green=2, Yellow=3, Red=4, Purple=5])
 - Game duration = 120 seconds
 - Goal: Get the highest score possible!
 
