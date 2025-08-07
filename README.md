@@ -28,17 +28,19 @@ Bubble Popper is a simple one-screen mobile game where:
 - **Language**: Pure JavaScript (.js files)
 - **Framework**: React Native
 - **Animation**: Built-in Animated API
-- **Input**: Built-in Pressable component
+- **Input**: Built-in Pressable component, Built in PanResponder component
 
 ## File Structure
 
 ```
 BubblePopper/
-├── App.js                 # Main app component that registers GameScreen
-├── GameScreen.js          # Game logic & hooks
+├── App.js                    # Main app component that registers GameScreen
+├── GameScreen.js             # Game logic & hooks
 ├── components/
-│   ├── Bubble.js         # Circle view component
-│   └── Laser.js          # Temporary vertical line component
+│   ├── Bubble.js             # Circle view component
+│   ├── Laser.js              # Temporary vertical line component
+|   ├── BubblePopEffect.js    # Bubble pop animation component
+|   └── ScorePopup.js         # Score pop-up animation component
 ├── package.json
 └── README.md
 ```
@@ -110,7 +112,7 @@ npm start
 
 - Uses React hooks (useState, useEffect, useRef) for state management
 - Implements game loops using setInterval for bubble spawning and animation
-- Uses Pressable component for touch input handling
+- Uses Pressable component and PanResponder component for touch input handling, 
 - Collision detection between laser and bubbles using distance calculation
 - Responsive design that adapts to different screen sizes
 
